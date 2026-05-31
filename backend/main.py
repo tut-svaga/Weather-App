@@ -1,9 +1,16 @@
 import httpx
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Weather DevOps Service")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # Валидация выходных данных
 class JsonWeather(BaseModel):
     city_name: str
@@ -44,7 +51,7 @@ async def get_weather(request: Request, city: str = None):
         
         # СЦЕНАРИЙ 1: Пользователь сам передал город (?city=Tiraspol)
         if city:
-            geo_url = "https://geocoding-api.open-meteo.com/v1/search"
+            geo_url = "https://weather-backend.onrender.com/weather"
             geo_params = {"name": city, "count": 1, "language": "ru", "format": "json"}
             
             geo_response = await client.get(geo_url, params=geo_params)

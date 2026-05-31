@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: weather-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+
+  - type: web
+    name: weather-frontend
+    env: static
+    staticPublishPath: ./frontend
+    plan: free
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
