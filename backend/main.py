@@ -51,7 +51,7 @@ async def get_weather(request: Request, city: str = None):
         
         # СЦЕНАРИЙ 1: Пользователь сам передал город (?city=Tiraspol)
         if city:
-            geo_url = "https://weather-frontend-fvss.onrender.com"
+            geo_url = "https://weather-backend-cayx.onrender.com"
             geo_params = {"name": city, "count": 1, "language": "ru", "format": "json"}
             
             geo_response = await client.get(geo_url, params=geo_params)
