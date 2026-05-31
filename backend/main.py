@@ -83,8 +83,11 @@ async def get_weather(request: Request, city: str = None):
                 
             ip_url = f"http://ip-api.com/json/{client_ip}?lang=ru"
             ip_response = await client.get(ip_url)
-            if ip_response.status_code != 200:
-                raise HTTPException(status_code=500, detail="IP Geolocation service error")
+            if geo_response.status_code != 200:
+                raise HTTPException(
+                    status_code=500, 
+                    detail=f"Geocoding error: {geo_response.status_code} - {geo_response.text}"
+                )
                 
             ip_data = ip_response.json()
             if ip_data.get("status") == "fail":
