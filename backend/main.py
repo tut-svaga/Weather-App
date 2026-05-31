@@ -21,7 +21,7 @@ class JsonWeather(BaseModel):
 # ЯДРО: Единая функция запроса погоды по коордам
 # ==========================================
 async def fetch_weather(client: httpx.AsyncClient, lat: float, lon: float, city_name: str) -> JsonWeather:
-    weather_url = "https://weather-backend-cayx.onrender.com"
+    weather_url = "https://api.open-meteo.com/v1/forecast"
     params = {
         "latitude": lat,
         "longitude": lon,
@@ -51,7 +51,7 @@ async def get_weather(request: Request, city: str = None):
         
         # СЦЕНАРИЙ 1: Пользователь сам передал город (?city=Tiraspol)
         if city:
-            geo_url = "https://weather-backend-cayx.onrender.com"
+            geo_url = "https://geocoding-api.open-meteo.com/v1/search"
             geo_params = {"name": city, "count": 1, "language": "ru", "format": "json"}
             
             geo_response = await client.get(geo_url, params=geo_params)
@@ -75,8 +75,11 @@ async def get_weather(request: Request, city: str = None):
             client_ip = request.client.host
             
             # DevOps-заглушка: ip-api.com не умеет в локальные IP (127.0.0.1 или 192.168.x.x)
-            if client_ip in ("127.0.0.1", "localhost") or client_ip.startswith("192.168."):
-                client_ip = "178.17.173.1" # Дефолтный внешний IP для тестов локально
+            if (client_ip in ("127.0.0.1", "localhost") 
+                or client_ip.startswith("192.168.") 
+                or client_ip.startswith("10.") 
+                or client_ip.startswith("172.")):
+                client_ip = "178.17.173.1"
                 
             ip_url = f"http://ip-api.com/json/{client_ip}?lang=ru"
             ip_response = await client.get(ip_url)
