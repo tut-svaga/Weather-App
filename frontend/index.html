@@ -70,8 +70,7 @@
     </div>
 
     <script>
-        // ВАЖНО: Укажи здесь IP своей виртуалки Ubuntu и порт твоего FastAPI (8000)
-        const BACKEND_URL = "/api/weather"; 
+        const BACKEND_URL = "https://weather-backend-cayx.onrender.com/weather";
 
         const cityInput = document.getElementById('cityInput');
         const searchBtn = document.getElementById('searchBtn');
@@ -81,7 +80,6 @@
         const errorBlock = document.getElementById('errorBlock');
 
         async function getWeatherData(url) {
-            // Показываем лоадер, скрываем старые данные и ошибки
             loading.classList.remove('hidden');
             weatherWidget.classList.add('hidden');
             errorBlock.classList.add('hidden');
@@ -94,7 +92,6 @@
                     throw new Error(data.detail || `Ошибка сервера: ${response.status}`);
                 }
 
-                // Заполняем интерфейс данными из JSON
                 document.getElementById('cityName').innerText = data.city_name;
                 document.getElementById('tempValue').innerText = `${data.temperature_2m} °C`;
                 document.getElementById('windValue').innerText = `${data.wind_speed_10m} км/ч`;
@@ -108,7 +105,6 @@
             }
         }
 
-        // Слушатели событий на кнопки
         searchBtn.addEventListener('click', () => {
             const city = cityInput.value.trim();
             if (city) getWeatherData(`${BACKEND_URL}?city=${city}`);
@@ -123,7 +119,6 @@
             getWeatherData(BACKEND_URL);
         });
 
-        // Автоматический запрос по IP при первой загрузке страницы
         window.addEventListener('DOMContentLoaded', () => getWeatherData(BACKEND_URL));
     </script>
 </body>
