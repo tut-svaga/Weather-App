@@ -10,7 +10,6 @@ services:
     name: weather-frontend
     env: static
     staticPublishPath: ./frontend
-    plan: free
     routes:
       - type: rewrite
         source: /*
