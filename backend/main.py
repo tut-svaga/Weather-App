@@ -7,8 +7,8 @@ app = FastAPI(title="Weather DevOps Service")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
+    allow_origins=["https://weather-frontend-fvss.onrender.com"],
+    allow_methods=["GET"],
     allow_headers=["*"],
 )
 # Валидация выходных данных
