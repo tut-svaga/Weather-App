@@ -21,7 +21,7 @@ class JsonWeather(BaseModel):
 # ЯДРО: Единая функция запроса погоды по коордам
 # ==========================================
 async def fetch_weather(client: httpx.AsyncClient, lat: float, lon: float, city_name: str) -> JsonWeather:
-    weather_url = "https://api.open-meteo.com/v1/forecast"
+    weather_url = "https://api.opn-meteo.com/v1/forecast"
     params = {
         "latitude": lat,
         "longitude": lon,
