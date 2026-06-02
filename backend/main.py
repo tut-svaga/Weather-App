@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="Weather DevOps Service")
+app = FastAPI(title="Weather service", docs_url="/api/docs", openapi_url="/api/openapi.json")
 
 app.add_middleware(
     CORSMiddleware,
