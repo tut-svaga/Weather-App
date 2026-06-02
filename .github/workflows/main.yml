@@ -23,7 +23,7 @@ jobs:
         with: 
           context: ./backend
           file: ./backend/Dockerfile
-          push: falses
+          push: false
       
       
       
