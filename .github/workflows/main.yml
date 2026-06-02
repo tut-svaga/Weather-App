@@ -1,0 +1,33 @@
+name: Git Actions
+
+on:
+  push: 
+    branches: 
+      - main
+      - dev
+  pull_request:
+    branches: 
+      - main
+      - dev
+jobs:
+  weather:
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: CheckOut
+        uses: actions/checkout@v4  
+
+      - name: Set Up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: test Docker (backend)
+        uses: docker/build-push-action@v6
+        with: 
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: false
+      
+      
+      
+      
+      
