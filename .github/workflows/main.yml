@@ -9,7 +9,24 @@ on:
       - develop
 jobs:
   weather:
+<<<<<<< HEAD
     runs-on: ubuntu-latestmatrix.os }}
+=======
+    runs-on: ubuntu-latest
+
+on:
+  push: 
+    branches: 
+      - main
+      - dev
+  pull_request:
+    branches: 
+      - main
+      - dev
+jobs:
+  weather:
+    runs-on: ${{ matrix.os }}
+>>>>>>> d6ec99bd1bb0cd47b5d24ea1c098f50df032a6f6
 
     steps:
       - name: CheckOut
