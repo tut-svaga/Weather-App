@@ -1,6 +1,5 @@
 name: Git Actions
 
-<<<<<<< HEAD
 on: 
   push:
     branches:
@@ -11,7 +10,7 @@ on:
 jobs:
   weather:
     runs-on: ubuntu-latest
-=======
+
 on:
   push: 
     branches: 
@@ -24,7 +23,6 @@ on:
 jobs:
   weather:
     runs-on: ${{ matrix.os }}
->>>>>>> deb01309e88f5dd63f039854ea07243c2f5d6347
 
     steps:
       - name: CheckOut
