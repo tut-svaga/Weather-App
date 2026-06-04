@@ -9,8 +9,7 @@ services:
     env_file: .env
     volumes:
       - ./backend:/app
-  frontend:
-    image: weather_front
+  nginx:
     build:
       context: ./frontend
     container_name: weath_front
@@ -20,5 +19,3 @@ services:
       - .env
     depends_on:
       - backend
-    volumes:
-      - ./frontend:/app
