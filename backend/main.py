@@ -7,7 +7,11 @@ app = FastAPI(title="Weather service", docs_url="/api/docs", openapi_url="/api/o
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://weather-frontend-fvss.onrender.com"],
+    allow_origins=[
+        "https://weather-frontend-fvss.onrender.com",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
+    ],
     allow_methods=["GET"],
     allow_headers=["*"],
 )
@@ -83,10 +87,10 @@ async def get_weather(request: Request, city: str = None):
                 
             ip_url = f"http://ip-api.com/json/{client_ip}?lang=ru"
             ip_response = await client.get(ip_url)
-            if geo_response.status_code != 200:
+            if ip_response.status_code != 200:
                 raise HTTPException(
                     status_code=500, 
-                    detail=f"Geocoding error: {geo_response.status_code} - {geo_response.text}"
+                    detail=f"IP geolocation error: {ip_response.status_code} - {ip_response.text}"
                 )
                 
             ip_data = ip_response.json()
