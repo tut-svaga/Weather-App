@@ -1,9 +1,14 @@
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
 FROM nginx:alpine
 
-# Копируем наш конфиг поверх дефолтного
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./nginx.conf ./etc/nginx/conf.d/defaule.conf
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Копируем файлы фронта
-COPY . /usr/share/nginx/html
-
-EXPOSE 80
+EXPOSE 10000
+CMD ["nginx", "-g", "daemon off;"]
