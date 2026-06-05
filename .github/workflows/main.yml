@@ -1,31 +1,32 @@
-name: Git Actions
+name: CI
 
-on: 
+on:
   push:
     branches:
-      - develop
+      - main
+      - dev
   pull_request:
     branches:
-      - develop
+      - main
+      - dev
+
 jobs:
-  weather:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: CheckOut
-        uses: actions/checkout@v4  
-
-      - name: Set Up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
       
-      - name: test Docker (backend)
-        uses: docker/build-push-action@v6
-        with: 
-          context: ./backend
-          file: ./backend/Dockerfile
-          push: false
+      - name: Set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: install requirements
+        run: pip install pytest httpx fastapi -r backend/requirements.txt
       
-      
+      - name: Run tests
+        run: pytest backend/tests/ -v 
       
       
       
