@@ -1,7 +1,7 @@
 import { mockWeather } from '../data/mockWeather';
 import { normalizeCurrentBackendWeather } from '../utils/weatherCodes';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api';
 
 export async function fetchWeather(city) {
   const query = city ? `?city=${encodeURIComponent(city)}` : '';
@@ -9,6 +9,11 @@ export async function fetchWeather(city) {
 
   if (!response.ok) {
     throw new Error('Backend пока не вернул погоду');
+  }
+
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    throw new Error('Backend вернул не JSON');
   }
 
   const data = await response.json();
