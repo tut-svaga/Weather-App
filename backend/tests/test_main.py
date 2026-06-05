@@ -10,6 +10,7 @@ def test_weather_returns_200():
 def test_weather_response_has_correct_fields():
     response = client.get("/weather?city=London")
     data = response.json()
-    assert "city_name" in data
-    assert "temperature_2m" in data
-    assert "wind_speed_10m" in data
+    assert "city" in data
+    assert "country" in data
+    assert "current" in data
+    assert "daily" in data
