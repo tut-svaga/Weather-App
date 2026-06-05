@@ -71,8 +71,13 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5174",
         "http://127.0.0.1:5174",
+        "http://localhost",
+        "http://localhost:80",
+        "http://127.0.0.1",
+        "http://127.0.0.1:80",
         "https://weather-frontend-fvss.onrender.com",
     ],
+    allow_origin_regex=r"https://.*\.onrender\.com",
     allow_methods=["GET"],
     allow_headers=["*"],
 )
