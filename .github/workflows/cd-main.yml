@@ -26,7 +26,7 @@ jobs:
     needs: test       
     steps:
       - name: Deploy Backend
-        run: curl -X POST "${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}"
+        run: curl -X POST "${{ secrets.PROD_RENDER_BACKEND_DEPLOY_HOOK }}"
 
       - name: Deploy Frontend
-        run: curl -X POST "${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}"
+        run: curl -X POST "${{ secrets.PROD_RENDER_FRONTEND_DEPLOY_HOOK }}"
