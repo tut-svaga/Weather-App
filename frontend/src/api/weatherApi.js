@@ -5,13 +5,9 @@ function resolveApiBaseUrl() {
   if (import.meta.env.VITE_API_BASE_URL) {
     return import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
   }
-
-  const isLocalHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-
-  if (import.meta.env.DEV || isLocalHost) {
+  if (import.meta.env.DEV) {
     return 'http://localhost:8000';
   }
-
   return '/api';
 }
 

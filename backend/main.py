@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Literal
-
+from app.routers.quotes import router as quotes_router
 import httpx
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -65,6 +65,8 @@ app = FastAPI(
     docs_url="/api/docs",
     openapi_url="/api/openapi.json",
 )
+
+app.include_router(quotes_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -286,6 +288,6 @@ async def fetch_forecast(client: httpx.AsyncClient, location: dict) -> WeatherRe
 
 @app.get("/weather", response_model=WeatherResponse)
 async def get_weather(request: Request, city: str | None = None):
-    async with httpx.AsyncClient(timeout=12) as client:
+    async with httpx.AsyncClient(timeout=60) as client:
         location = await locate_by_city(client, city) if city else await locate_by_ip(client, request)
         return await fetch_forecast(client, location)
