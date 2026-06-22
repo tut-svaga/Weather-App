@@ -8,6 +8,7 @@ import { HourlyForecast } from './components/HourlyForecast';
 import { WeatherScene } from './components/WeatherScene';
 import { LoadingState } from './components/LoadingState';
 import { ErrorState } from './components/ErrorState';
+import RandomQuote from './components/RandomQuote';
 
 export default function App() {
   const [weather, setWeather] = useState(mockWeather);
@@ -63,6 +64,7 @@ export default function App() {
           onSelectDate={setSelectedDate}
         />
         <HourlyForecast hours={selectedHours} />
+        <RandomQuote />
       </section>
     </main>
   );
