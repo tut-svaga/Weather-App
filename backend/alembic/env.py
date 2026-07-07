@@ -1,7 +1,6 @@
 # alembic/env.py — async версия для asyncpg
 
 import asyncio
-import os
 from logging.config import fileConfig
 
 from sqlalchemy import pool
@@ -11,7 +10,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 # Импортируем Base и все модели, чтобы Alembic их видел при autogenerate
-from app.database import Base
+from app.database import Base, DATABASE_URL
 from app.models import Quote  # noqa: F401
 
 config = context.config
@@ -22,10 +21,7 @@ target_metadata = Base.metadata
 
 
 def get_url() -> str:
-    return os.getenv(
-        "DATABASE_URL",
-        "postgresql+asyncpg://quotes_user:password@postgres:5432/quotes_db",
-    )
+    return DATABASE_URL
 
 
 def run_migrations_offline() -> None:
