@@ -1,4 +1,6 @@
+import asyncio
 from datetime import datetime
+import logging
 from typing import Literal
 from app.routers.quotes import router as quotes_router
 import httpx
@@ -9,6 +11,8 @@ from pydantic import BaseModel
 
 Condition = Literal["clear", "cloudy", "rain", "storm", "snow", "fog"]
 Intensity = Literal["soft", "medium", "strong"]
+logger = logging.getLogger(__name__)
+RETRYABLE_UPSTREAM_STATUSES = {429, 500, 502, 503, 504}
 
 
 class CurrentWeather(BaseModel):
@@ -85,6 +89,53 @@ app.add_middleware(
 )
 
 
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
+
+async def fetch_upstream_json(
+    client: httpx.AsyncClient,
+    url: str,
+    service_name: str,
+    **kwargs,
+) -> dict:
+    """Fetch JSON and preserve the upstream failure in Render logs."""
+    for attempt in range(3):
+        try:
+            response = await client.get(url, **kwargs)
+        except httpx.RequestError as exc:
+            logger.warning(
+                "%s request failed (attempt %s/3): %s",
+                service_name,
+                attempt + 1,
+                exc,
+            )
+            if attempt == 2:
+                raise HTTPException(status_code=502, detail=f"{service_name} unavailable") from exc
+        else:
+            if response.status_code == 200:
+                try:
+                    return response.json()
+                except ValueError as exc:
+                    logger.error("%s returned invalid JSON: %.500s", service_name, response.text)
+                    raise HTTPException(status_code=502, detail=f"{service_name} returned invalid data") from exc
+
+            logger.warning(
+                "%s returned HTTP %s (attempt %s/3): %.500s",
+                service_name,
+                response.status_code,
+                attempt + 1,
+                response.text,
+            )
+            if response.status_code not in RETRYABLE_UPSTREAM_STATUSES or attempt == 2:
+                raise HTTPException(status_code=502, detail=f"{service_name} error")
+
+        await asyncio.sleep(0.5 * (2**attempt))
+
+    raise HTTPException(status_code=502, detail=f"{service_name} unavailable")
+
+
 def describe_weather(code: int, precipitation: float = 0) -> tuple[Condition, Intensity]:
     if code in (0, 1):
         return "clear", "soft"
@@ -116,15 +167,12 @@ def day_label(date_text: str, index: int) -> str:
 
 
 async def locate_by_city(client: httpx.AsyncClient, city: str) -> dict:
-    response = await client.get(
+    data = await fetch_upstream_json(
+        client,
         "https://geocoding-api.open-meteo.com/v1/search",
+        "Geocoding service",
         params={"name": city, "count": 1, "language": "ru", "format": "json"},
     )
-
-    if response.status_code != 200:
-        raise HTTPException(status_code=502, detail="Geocoding service error")
-
-    data = response.json()
     results = data.get("results") or []
     if not results:
         raise HTTPException(status_code=404, detail=f"City '{city}' not found")
@@ -149,11 +197,11 @@ async def locate_by_ip(client: httpx.AsyncClient, request: Request) -> dict:
     ):
         client_ip = "178.17.173.1"
 
-    response = await client.get(f"http://ip-api.com/json/{client_ip}?lang=ru")
-    if response.status_code != 200:
-        raise HTTPException(status_code=502, detail="IP geolocation service error")
-
-    data = response.json()
+    data = await fetch_upstream_json(
+        client,
+        f"http://ip-api.com/json/{client_ip}?lang=ru",
+        "IP geolocation service",
+    )
     if data.get("status") == "fail":
         raise HTTPException(status_code=400, detail=data.get("message", "Failed to locate IP"))
 
@@ -166,8 +214,10 @@ async def locate_by_ip(client: httpx.AsyncClient, request: Request) -> dict:
 
 
 async def fetch_forecast(client: httpx.AsyncClient, location: dict) -> WeatherResponse:
-    response = await client.get(
+    data = await fetch_upstream_json(
+        client,
         "https://api.open-meteo.com/v1/forecast",
+        "Open-Meteo API",
         params={
             "latitude": location["latitude"],
             "longitude": location["longitude"],
@@ -205,11 +255,6 @@ async def fetch_forecast(client: httpx.AsyncClient, location: dict) -> WeatherRe
             "timezone": "auto",
         },
     )
-
-    if response.status_code != 200:
-        raise HTTPException(status_code=502, detail="Open-Meteo API error")
-
-    data = response.json()
     current = data["current"]
     current_condition, current_intensity = describe_weather(
         current["weather_code"],

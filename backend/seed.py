@@ -4,15 +4,9 @@
 # (из директории backend, при запущенной БД)
 
 import asyncio
-import os
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from app.models.quote import Quote
-from app.database import Base
-
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql+asyncpg://quotes_user:password@localhost:5432/quotes_db",
-)
+from app.database import Base, DATABASE_URL
 
 QUOTES = [
     {"text": "The only way to do great work is to love what you do.", "author": "Steve Jobs", "category": "motivation"},

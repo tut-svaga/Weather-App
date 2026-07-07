@@ -9,6 +9,13 @@ DATABASE_URL = os.getenv(
     "postgresql+asyncpg://quotes_user:password@postgres:5432/quotes_db",
 )
 
+# Render provides PostgreSQL URLs with the sync ``postgresql://`` scheme.
+# This application uses SQLAlchemy's async engine, so select asyncpg explicitly.
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
+elif DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+
 engine = create_async_engine(
     DATABASE_URL,
     echo=False,          # поставь True если нужно видеть SQL в логах
