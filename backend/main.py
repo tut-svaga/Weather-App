@@ -129,7 +129,10 @@ async def fetch_upstream_json(
                 response.text,
             )
             if response.status_code not in RETRYABLE_UPSTREAM_STATUSES or attempt == 2:
-                raise HTTPException(status_code=502, detail=f"{service_name} error")
+                raise HTTPException(
+                    status_code=502,
+                    detail=f"{service_name} upstream HTTP {response.status_code}",
+                )
 
         await asyncio.sleep(0.5 * (2**attempt))
 
